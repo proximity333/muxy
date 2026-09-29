@@ -24,8 +24,10 @@ struct InterfaceSettingsViewTests {
 
         #expect(pickerFrame.minX >= hostingView.bounds.minX)
         #expect(pickerFrame.maxX <= hostingView.bounds.maxX)
-        #expect(picker.bounds.width >= picker.intrinsicContentSize.width)
+        #expect(picker.bounds.width >= picker.intrinsicContentSize.width - Self.subpointRoundingTolerance)
     }
+
+    private static let subpointRoundingTolerance: CGFloat = 1
 
     private func appLayoutPicker(in view: NSView) -> NSSegmentedControl? {
         if let control = view as? NSSegmentedControl,
