@@ -6,6 +6,44 @@ import Testing
 @Suite("LocalizationService")
 @MainActor
 struct LocalizationServiceTests {
+    @Test("built-in Simplified Chinese resolves from the app resource bundle")
+    func resolvesBuiltInChinese() {
+        let suiteName = "LocalizationServiceTests-\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            Issue.record("could not create isolated defaults")
+            return
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let service = LocalizationService(defaults: defaults)
+
+        service.refresh(
+            storedValue: LocalizationSelection.builtinPrefix + "zh-Hans",
+            bindings: []
+        )
+
+        #expect(service.locale.identifier == "zh-Hans")
+        #expect(service.bundleURL != nil)
+        #expect(service.string("Settings") == "设置")
+        #expect(service.string("Cancel") == "取消")
+    }
+
+    @Test("built-in English stays on the main bundle")
+    func builtInEnglishUsesMainBundle() {
+        let suiteName = "LocalizationServiceTests-\(UUID().uuidString)"
+        guard let defaults = UserDefaults(suiteName: suiteName) else {
+            Issue.record("could not create isolated defaults")
+            return
+        }
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let service = LocalizationService(defaults: defaults)
+
+        service.refresh(storedValue: LocalizationSelection.builtinValue, bindings: [])
+
+        #expect(service.locale.identifier == "en")
+        #expect(service.bundleURL == nil)
+        #expect(service.string("Settings") == "Settings")
+    }
+
     @Test("uses selected extension bundle and falls back to English")
     func resolvesSelectedBundleAndEnglishFallback() throws {
         let root = FileManager.default.temporaryDirectory

@@ -1,6 +1,14 @@
 import Foundation
 
 enum LocalizationSelection {
+    struct Builtin: Equatable, Identifiable {
+        let optionID: String
+        let language: String
+        let title: String
+
+        var id: String { optionID }
+    }
+
     struct Option: Equatable, Identifiable {
         let id: String
         let title: String
@@ -10,6 +18,16 @@ enum LocalizationSelection {
     static let storageKey = "muxy.localization"
     static let builtinValue = ""
     static let builtinTitle = "English"
+    static let builtinPrefix = "builtin:"
+
+    static let builtins: [Builtin] = [
+        Builtin(optionID: builtinValue, language: "en", title: builtinTitle),
+        Builtin(optionID: builtinPrefix + "zh-Hans", language: "zh-Hans", title: "简体中文"),
+    ]
+
+    static func builtin(forOptionID optionID: String) -> Builtin? {
+        builtins.first { $0.optionID == optionID }
+    }
 
     @MainActor
     static func resolvedBinding(
@@ -32,9 +50,9 @@ enum LocalizationSelection {
         from bindings: [ExtensionStore.LocalizationBinding],
         selectedValue: String
     ) -> [Option] {
-        var options = [
-            Option(id: builtinValue, title: builtinTitle, isAvailable: true),
-        ]
+        var options = builtins.map {
+            Option(id: $0.optionID, title: $0.title, isAvailable: true)
+        }
         options += bindings.map {
             Option(
                 id: $0.id,

@@ -5,8 +5,8 @@ import Testing
 
 @Suite("LocalizationSelection")
 struct LocalizationSelectionTests {
-    @Test("options always include built-in English")
-    func optionsIncludeEnglish() {
+    @Test("options list built-in languages first")
+    func optionsIncludeBuiltins() {
         let options = LocalizationSelection.options(
             from: [],
             selectedValue: LocalizationSelection.builtinValue
@@ -18,7 +18,26 @@ struct LocalizationSelectionTests {
                 title: "English",
                 isAvailable: true
             ),
+            .init(
+                id: LocalizationSelection.builtinPrefix + "zh-Hans",
+                title: "简体中文",
+                isAvailable: true
+            ),
         ])
+    }
+
+    @Test("built-in languages resolve by option id")
+    func builtinsResolveByOptionID() {
+        let english = LocalizationSelection.builtin(forOptionID: LocalizationSelection.builtinValue)
+        #expect(english?.language == "en")
+
+        let chinese = LocalizationSelection.builtin(
+            forOptionID: LocalizationSelection.builtinPrefix + "zh-Hans"
+        )
+        #expect(chinese?.language == "zh-Hans")
+
+        #expect(LocalizationSelection.builtin(forOptionID: "community-de:de") == nil)
+        #expect(LocalizationSelection.builtin(forOptionID: "builtin:missing") == nil)
     }
 
     @Test("options distinguish providers from multiple extensions")
@@ -33,6 +52,7 @@ struct LocalizationSelectionTests {
 
         #expect(options.map(\.title) == [
             "English",
+            "简体中文",
             "Deutsch — community-de",
             "Deutsch — formal-de",
         ])

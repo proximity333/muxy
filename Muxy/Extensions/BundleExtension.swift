@@ -1,5 +1,7 @@
 import Foundation
 
+private final class ResourceBundleFinder {}
+
 extension Bundle {
     static let appResources: Bundle = {
         let bundleName = "Muxy_Muxy.bundle"
@@ -8,6 +10,7 @@ extension Bundle {
             Bundle.main.resourceURL?.appendingPathComponent(bundleName),
             Bundle.main.bundleURL.appendingPathComponent(bundleName),
             Bundle.main.bundleURL.appendingPathComponent("Contents/Resources/\(bundleName)"),
+            Bundle(for: ResourceBundleFinder.self).resourceURL?.appendingPathComponent(bundleName),
         ]
 
         for case let url? in candidates {

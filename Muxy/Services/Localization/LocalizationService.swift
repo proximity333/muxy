@@ -36,26 +36,25 @@ final class LocalizationService {
         let previousSelection = activeSelection
         let previousLocale = locale
         let previousBundleURL = bundleURL
-        guard let identifier = LocalizationSelection.parse(storedValue),
-              let binding = bindings.first(where: {
-                  $0.muxyExtension.id == identifier.extensionID
-                      && $0.localization.id == identifier.localizationID
-              }),
-              let resolvedBundleURL = binding.bundleURL
-        else {
+        if let builtin = LocalizationSelection.builtin(forOptionID: storedValue) {
+            activeSelection = builtin.optionID
+            locale = Locale(identifier: builtin.language)
+            bundleURL = builtin.language == "en" ? nil : Bundle.appResources.bundleURL
+        } else if let identifier = LocalizationSelection.parse(storedValue),
+                  let binding = bindings.first(where: {
+                      $0.muxyExtension.id == identifier.extensionID
+                          && $0.localization.id == identifier.localizationID
+                  }),
+                  let resolvedBundleURL = binding.bundleURL
+        {
+            activeSelection = binding.id
+            locale = Locale(identifier: binding.localization.language)
+            bundleURL = resolvedBundleURL
+        } else {
             activeSelection = LocalizationSelection.builtinValue
             locale = Locale(identifier: "en")
             bundleURL = nil
-            postChangeIfNeeded(
-                previousSelection: previousSelection,
-                previousLocale: previousLocale,
-                previousBundleURL: previousBundleURL
-            )
-            return
         }
-        activeSelection = binding.id
-        locale = Locale(identifier: binding.localization.language)
-        bundleURL = resolvedBundleURL
         postChangeIfNeeded(
             previousSelection: previousSelection,
             previousLocale: previousLocale,

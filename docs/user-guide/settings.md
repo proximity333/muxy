@@ -15,7 +15,7 @@ menu. They are off by default and are stored as `muxy.richInput.clearAfterSendin
 
 ## Language
 
-English is built in. Enabled extensions can provide additional app languages, and every provider appears under
+English and Simplified Chinese are built in. Enabled extensions can provide additional app languages, and every provider appears under
 **Interface → Language** with the extension name so you can choose between multiple providers for the same language.
 Choose **Browse Language Extensions…** to open the Extension Store already filtered to available language packs.
 After installing and enabling a pack, its languages appear automatically in the app-language picker.
