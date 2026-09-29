@@ -39,6 +39,7 @@ struct DesktopNotificationPayload: Equatable {
 @MainActor
 protocol DesktopNotificationDelivering: AnyObject {
     func deliver(_ notification: MuxyNotification)
+    func withdraw(_ ids: [UUID])
 }
 
 protocol UserNotificationScheduling: AnyObject {
@@ -50,6 +51,8 @@ protocol UserNotificationScheduling: AnyObject {
         completionHandler: @escaping @Sendable (Bool, (any Error)?) -> Void
     )
     func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: (@Sendable ((any Error)?) -> Void)?)
+    func removeDeliveredNotifications(withIdentifiers identifiers: [String])
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String])
 }
 
 final class SystemUserNotificationScheduler: UserNotificationScheduling {
@@ -94,6 +97,16 @@ final class SystemUserNotificationScheduler: UserNotificationScheduling {
         center.add(request, withCompletionHandler: completionHandler)
     }
 
+    func removeDeliveredNotifications(withIdentifiers identifiers: [String]) {
+        guard !identifiers.isEmpty else { return }
+        center?.removeDeliveredNotifications(withIdentifiers: identifiers)
+    }
+
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String]) {
+        guard !identifiers.isEmpty else { return }
+        center?.removePendingNotificationRequests(withIdentifiers: identifiers)
+    }
+
     private static func defaultCenter() -> UNUserNotificationCenter? {
         guard Bundle.main.bundleIdentifier != nil else { return nil }
         return .current()
@@ -131,6 +144,13 @@ final class DesktopNotificationService: NSObject, DesktopNotificationDelivering 
 
     func deliver(_ notification: MuxyNotification) {
         schedule(DesktopNotificationPayload(notification: notification))
+    }
+
+    func withdraw(_ ids: [UUID]) {
+        guard !ids.isEmpty else { return }
+        let identifiers = ids.map(\.uuidString)
+        scheduler.removeDeliveredNotifications(withIdentifiers: identifiers)
+        scheduler.removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 
     func requestAuthorizationIfNeeded(completion: (@MainActor (Bool) -> Void)? = nil) {

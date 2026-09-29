@@ -155,6 +155,31 @@ struct DesktopNotificationServiceTests {
         #expect(scheduler.authorizationRequests.isEmpty)
     }
 
+    @Test("withdrawing removes delivered and pending banners by notification identifier")
+    func withdrawingRemovesDeliveredAndPendingBanners() {
+        let scheduler = UserNotificationSchedulerSpy()
+        let service = DesktopNotificationService(scheduler: scheduler)
+        let first = makeNotification()
+        let second = makeNotification()
+
+        service.deliver(first)
+        service.withdraw([first.id, second.id])
+
+        #expect(scheduler.removedDelivered == [[first.id.uuidString, second.id.uuidString]])
+        #expect(scheduler.removedPending == [[first.id.uuidString, second.id.uuidString]])
+    }
+
+    @Test("withdrawing nothing does not touch the notification center")
+    func withdrawingNothingSkipsTheNotificationCenter() {
+        let scheduler = UserNotificationSchedulerSpy()
+        let service = DesktopNotificationService(scheduler: scheduler)
+
+        service.withdraw([])
+
+        #expect(scheduler.removedDelivered.isEmpty)
+        #expect(scheduler.removedPending.isEmpty)
+    }
+
     @Test("settings authorization callback reports denied permission")
     func settingsAuthorizationReportsDeniedPermission() async throws {
         let scheduler = UserNotificationSchedulerSpy(authorizationStatus: .notDetermined, grantsAuthorization: false)
@@ -215,6 +240,8 @@ private final class UserNotificationSchedulerSpy: UserNotificationScheduling {
     var grantsAuthorization: Bool
     var authorizationRequests: [UNAuthorizationOptions] = []
     var requests: [UNNotificationRequest] = []
+    var removedDelivered: [[String]] = []
+    var removedPending: [[String]] = []
 
     init(authorizationStatus: UNAuthorizationStatus = .authorized, grantsAuthorization: Bool = true) {
         self.authorizationStatus = authorizationStatus
@@ -239,5 +266,13 @@ private final class UserNotificationSchedulerSpy: UserNotificationScheduling {
     func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: (@Sendable ((any Error)?) -> Void)?) {
         requests.append(request)
         completionHandler?(nil)
+    }
+
+    func removeDeliveredNotifications(withIdentifiers identifiers: [String]) {
+        removedDelivered.append(identifiers)
+    }
+
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String]) {
+        removedPending.append(identifiers)
     }
 }

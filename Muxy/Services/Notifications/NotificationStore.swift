@@ -100,13 +100,16 @@ final class NotificationStore {
 
     func markAsRead(tabID: UUID) {
         var changed = false
+        var withdrawn: [UUID] = []
         for notification in notifications where !notification.isRead && notification.tabID == tabID {
             notification.isRead = true
             changed = true
+            withdrawn.append(notification.id)
         }
         if changed {
             readStateVersion += 1
             scheduleSave()
+            withdraw(withdrawn)
         }
     }
 
@@ -288,41 +291,56 @@ final class NotificationStore {
         notifications[index].isRead = true
         readStateVersion += 1
         scheduleSave()
+        withdraw([id])
     }
 
     func markAllAsRead() {
         var changed = false
+        var withdrawn: [UUID] = []
         for notification in notifications where !notification.isRead {
             notification.isRead = true
             changed = true
+            withdrawn.append(notification.id)
         }
         if changed {
             readStateVersion += 1
             scheduleSave()
+            withdraw(withdrawn)
         }
     }
 
     func markAllAsRead(projectID: UUID) {
         var changed = false
+        var withdrawn: [UUID] = []
         for notification in notifications where !notification.isRead && notification.projectID == projectID {
             notification.isRead = true
             changed = true
+            withdrawn.append(notification.id)
         }
         if changed {
             readStateVersion += 1
             scheduleSave()
+            withdraw(withdrawn)
         }
     }
 
     func remove(_ id: UUID) {
         notifications.removeAll { $0.id == id }
         scheduleSave()
+        withdraw([id])
     }
 
     func clear() {
+        let removedIDs = notifications.map(\.id)
         notifications.removeAll()
         pendingDesktopDeliveries.removeAll()
         scheduleSave()
+        withdraw(removedIDs)
+    }
+
+    private func withdraw(_ ids: [UUID]) {
+        guard !ids.isEmpty else { return }
+        desktopNotifier?.withdraw(ids)
     }
 
     private func trimIfNeeded() {

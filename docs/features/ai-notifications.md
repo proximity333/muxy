@@ -40,6 +40,8 @@ The bridge retries an event when an ack does not arrive within its delivery budg
 
 When an AI hook and terminal OSC report the same body and navigation context within two seconds, Muxy coalesces only their macOS desktop-notification delivery. Matching titles and the default completion titles are treated as equivalent for this delivery check. A delivery is suppressed only when exactly one complementary pending ingress matches; ambiguous candidates, including different AI providers, are all delivered. Both notification records remain available to the notification list, API, extensions, and in-app delivery. Extension-origin notifications are not eligible for this coalescing.
 
+A macOS banner is withdrawn once its notification is marked read — switching to the note's tab, reactivating Muxy on it, opening it from the notification panel, or marking it read from a paired phone — and **Clear All** removes every remaining banner. Banners for other unread tabs are left alone.
+
 ## Staging layout
 
 The compiled hook bridge (`muxy-hook`) and the provider shims are staged into `~/Library/Application Support/Muxy/hooks` (`hooks-dev` for debug builds) with private permissions:

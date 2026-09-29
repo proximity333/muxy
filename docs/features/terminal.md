@@ -251,6 +251,8 @@ The Agents Focused layout keeps the normal top-level tab strip in the title bar 
 
 OSC 9 and OSC 777 notification escape sequences are routed into Muxy's notification panel and (optionally) macOS notifications.
 
+A macOS banner is withdrawn as soon as its notification is marked read — when you switch to its tab, reactivate Muxy on that tab, open it from the notification panel, or mark it read on a paired phone — and **Clear All** removes every remaining banner. Banners for other unread tabs stay in place.
+
 For AI coding agents (Antigravity CLI, Claude Code, Codex, Cursor, Droid, Grok, Kiro, OpenCode, Pi, Xal), Muxy uses hook-based lifecycle events rather than escape sequences — see [AI notifications](ai-notifications.md).
 
 ## Quick-select labels

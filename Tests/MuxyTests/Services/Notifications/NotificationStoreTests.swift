@@ -182,6 +182,49 @@ struct NotificationStoreTests {
         #expect(store.notifications.allSatisfy { $0.toDTO().source == .aiProvider($0.source.key) })
     }
 
+    @Test("reading a tab withdraws its delivered banners and leaves others intact")
+    func readingATabWithdrawsOnlyItsBanners() {
+        let store = NotificationStore.shared
+        store.clear()
+        let desktopNotifier = NotificationDesktopNotifierSpy()
+        let restoreDesktopDelivery = enableDesktopDelivery(store, notifier: desktopNotifier)
+        defer { restoreDesktopDelivery() }
+        let appState = makeAppState()
+        let firstContext = makeContext()
+        let secondContext = makeContext()
+
+        addNotification(source: .socket, context: firstContext, appState: appState, to: store)
+        addNotification(source: .socket, context: secondContext, appState: appState, to: store)
+        let firstID = store.notifications.first { $0.tabID == firstContext.tabID }?.id
+        let secondID = store.notifications.first { $0.tabID == secondContext.tabID }?.id
+
+        store.markAsRead(tabID: firstContext.tabID)
+
+        #expect(desktopNotifier.delivered.count == 2)
+        #expect(desktopNotifier.withdrawn == [[firstID].compactMap { $0 }])
+        #expect(store.notifications.first { $0.id == firstID }?.isRead == true)
+        #expect(store.notifications.first { $0.id == secondID }?.isRead == false)
+    }
+
+    @Test("clearing all notifications withdraws every banner")
+    func clearingAllWithdrawsEveryBanner() {
+        let store = NotificationStore.shared
+        store.clear()
+        let desktopNotifier = NotificationDesktopNotifierSpy()
+        let restoreDesktopDelivery = enableDesktopDelivery(store, notifier: desktopNotifier)
+        defer { restoreDesktopDelivery() }
+        let appState = makeAppState()
+
+        addNotification(source: .socket, context: makeContext(), appState: appState, to: store)
+        addNotification(source: .socket, context: makeContext(), appState: appState, to: store)
+        let deliveredIDs = desktopNotifier.delivered.map(\.id)
+
+        store.clear()
+
+        #expect(store.notifications.isEmpty)
+        #expect(Set(desktopNotifier.withdrawn.flatMap { $0 }) == Set(deliveredIDs))
+    }
+
     @Test("delivers matching AI hook and OSC notifications outside the coalescing window")
     func deliversMatchingAIHookAndOSCNotificationsOutsideTheCoalescingWindow() {
         let store = NotificationStore.shared
@@ -295,8 +338,13 @@ private final class NotificationWorkspacePersistenceStub: WorkspacePersisting {
 @MainActor
 private final class NotificationDesktopNotifierSpy: DesktopNotificationDelivering {
     private(set) var delivered: [MuxyNotification] = []
+    private(set) var withdrawn: [[UUID]] = []
 
     func deliver(_ notification: MuxyNotification) {
         delivered.append(notification)
+    }
+
+    func withdraw(_ ids: [UUID]) {
+        withdrawn.append(ids)
     }
 }
