@@ -131,6 +131,14 @@ if [[ ! -f "$TRANSPARENT_SURFACE_CONFIG" ]]; then
 fi
 cp -R "$RESOURCE_BUNDLE" "$APP_BUNDLE/Contents/Resources/Muxy_Muxy.bundle"
 
+echo "==> Compiling localization catalogs"
+while IFS= read -r -d '' catalog; do
+    if ! plutil -convert binary1 "$catalog"; then
+        echo "Error: Could not compile localization catalog at $catalog"
+        exit 1
+    fi
+done < <(find "$APP_BUNDLE/Contents/Resources/Muxy_Muxy.bundle" -name "*.strings" -print0)
+
 cp "$PROJECT_ROOT/Muxy/Info.plist" "$APP_BUNDLE/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_BUNDLE/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_BUNDLE/Contents/Info.plist"
