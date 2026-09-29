@@ -12,6 +12,7 @@ final class LocalizationService {
 
     private let defaults: UserDefaults
     private var searchStringCache: [String: String] = [:]
+    private var stringTable: [String: String] = [:]
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -55,6 +56,7 @@ final class LocalizationService {
             locale = Locale(identifier: "en")
             bundleURL = nil
         }
+        loadStringTable()
         postChangeIfNeeded(
             previousSelection: previousSelection,
             previousLocale: previousLocale,
@@ -62,20 +64,56 @@ final class LocalizationService {
         )
     }
 
+    private func loadStringTable() {
+        stringTable.removeAll(keepingCapacity: true)
+        guard let bundleURL, let bundle = Bundle(url: bundleURL) else { return }
+        stringTable = Self.loadTable(from: bundle, language: locale.identifier)
+    }
+
+    private static func loadTable(from bundle: Bundle, language: String) -> [String: String] {
+        guard let catalog = bundle.path(
+            forResource: "Localizable",
+            ofType: "strings",
+            inDirectory: nil,
+            forLocalization: language
+        ),
+            let table = NSDictionary(contentsOfFile: catalog) as? [String: String]
+        else { return [:] }
+        return table
+    }
+
     func resource(_ resource: LocalizedStringResource) -> LocalizedStringResource {
-        var localizedResource = resource
-        localizedResource.locale = locale
-        guard let bundleURL else { return localizedResource }
-        return LocalizedStringResource(
+        var translated = LocalizedStringResource(stringLiteral: resolve(resource))
+        translated.locale = locale
+        return translated
+    }
+
+    func string(_ resource: LocalizedStringResource) -> String {
+        resolve(resource)
+    }
+
+    private func resolve(_ resource: LocalizedStringResource) -> String {
+        if let translation = pretranslated(for: resource) {
+            return translation
+        }
+        guard let bundleURL else {
+            var fallback = resource
+            fallback.locale = locale
+            return String(localized: fallback)
+        }
+        let translated = LocalizedStringResource(
             resource.defaultValue,
             table: resource.table,
             locale: locale,
             bundle: .atURL(bundleURL)
         )
+        return String(localized: translated)
     }
 
-    func string(_ resource: LocalizedStringResource) -> String {
-        String(localized: self.resource(resource))
+    private func pretranslated(for resource: LocalizedStringResource) -> String? {
+        guard resource.table == nil else { return nil }
+        guard resource.defaultValue == String.LocalizationValue(resource.key) else { return nil }
+        return stringTable[resource.key]
     }
 
     func searchString(key: String) -> String {

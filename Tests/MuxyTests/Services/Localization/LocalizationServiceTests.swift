@@ -83,6 +83,36 @@ struct LocalizationServiceTests {
         #expect(defaults.string(forKey: LocalizationSelection.storageKey) == binding.id)
     }
 
+    @Test("caches the catalog so repeated lookups do not re-parse the bundle")
+    func repeatedLookupsUseTheCachedCatalog() throws {
+        let fixture = try LocalizationTestSupport.makeService(
+            translations: #"""
+            "Settings" = "Einstellungen";
+            "Open %@" = "%@ öffnen";
+            """#
+        )
+        defer { try? FileManager.default.removeItem(at: fixture.root) }
+
+        #expect(fixture.service.string("Settings") == "Einstellungen")
+
+        try FileManager.default.removeItem(at: fixture.root)
+
+        #expect(fixture.service.string("Settings") == "Einstellungen")
+    }
+
+    @Test("interpolated lookups keep the translated format and their arguments")
+    func interpolatedLookupsTranslateAndSubstitute() throws {
+        let fixture = try LocalizationTestSupport.makeService(
+            translations: #"""
+            "Settings" = "Einstellungen";
+            "Open %@" = "%@ öffnen";
+            """#
+        )
+        defer { try? FileManager.default.removeItem(at: fixture.root) }
+
+        #expect(fixture.service.string("Open \("Project")") == "Project öffnen")
+    }
+
     @Test("command search localizes only the built-in fallback name")
     func commandSearchLocalizesOnlyFallbackName() throws {
         let fixture = try LocalizationTestSupport.makeService(
