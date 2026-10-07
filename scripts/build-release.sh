@@ -223,6 +223,9 @@ if [[ -n "$SIGN_IDENTITY" ]]; then
         --entitlements "$PROJECT_ROOT/Muxy/Muxy.entitlements" \
         --sign "$SIGN_IDENTITY" \
         "$APP_BUNDLE"
+else
+    echo "==> Re-signing app bundle ad hoc (Info.plist was modified after the linker signature)"
+    /usr/bin/codesign --force --deep --sign - "$APP_BUNDLE"
 fi
 
 echo "==> Creating DMG"
