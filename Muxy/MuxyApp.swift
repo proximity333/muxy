@@ -21,6 +21,7 @@ struct MuxyApp: App {
     @State private var didStartDeferredServices = false
 
     init() {
+        LaunchDefaults.useOverlayScrollers()
         UserDefaults.standard.register(defaults: ["NSInitialToolTipDelay": 500])
         LaunchArgumentGuard.terminateIfNeeded()
         _ = MuxyApp.launchDate

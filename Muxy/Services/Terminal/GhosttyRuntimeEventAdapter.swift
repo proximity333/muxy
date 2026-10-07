@@ -137,7 +137,8 @@ final class GhosttyRuntimeEventAdapter: GhosttyRuntimeEventHandling {
 
     func writeClipboard(location: ghostty_clipboard_e, content: UnsafePointer<ghostty_clipboard_content_s>?, len: UInt) {
         guard let content, len > 0 else { return }
-        if location == GHOSTTY_CLIPBOARD_SELECTION {
+        let isSelectionCopy = location == GHOSTTY_CLIPBOARD_SELECTION
+        if isSelectionCopy {
             let autoCopyEnabled = UserDefaults.standard.bool(forKey: GeneralSettingsKeys.autoCopyTerminalSelection)
             guard Self.shouldWriteSelectionClipboard(settingEnabled: autoCopyEnabled) else { return }
         }
@@ -150,7 +151,16 @@ final class GhosttyRuntimeEventAdapter: GhosttyRuntimeEventHandling {
 
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(String(cString: dataPtr), forType: .string)
+            if isSelectionCopy {
+                showSelectionCopiedFeedback()
+            }
             return
+        }
+    }
+
+    private func showSelectionCopiedFeedback() {
+        DispatchQueue.main.async {
+            ToastState.shared.show(L10n.string("Copied selection"))
         }
     }
 

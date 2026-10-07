@@ -234,6 +234,7 @@
 "Connection succeeded" = "连接成功";
 "Controlled by %@" = "由 %@ 控制";
 "Copied" = "已复制";
+"Copied selection" = "已复制选中文本";
 "Copy" = "复制";
 "Copy %@" = "复制 %@";
 "Copy Path" = "复制路径";

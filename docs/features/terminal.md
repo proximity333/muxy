@@ -103,6 +103,7 @@ Reload the configuration with `⌘⇧R`, then open a new terminal. Ghostty appli
 | X11 selection paste | Middle-click |
 
 Enable **Settings -> Terminal -> Auto-copy terminal selection** to copy selected terminal text on mouse release.
+Each auto-copy shows a brief "Copied selection" confirmation.
 
 ### Attachments in SSH panes
 
@@ -170,6 +171,12 @@ between moving the pane and selecting text.
 
 Programs that enable mouse reporting keep receiving right-click. Hold `Shift` while right-clicking such a program
 to get Muxy's menu instead.
+
+## Scroll bars
+
+Muxy shows native scroll bars only while scrolling, whatever macOS's "Show scroll bars" setting says. The
+behavior is set in the app's in-memory launch-argument defaults at startup: nothing is saved, the system
+setting and other apps are unchanged, and Muxy's own drawn terminal scroll bar is unaffected.
 
 ## Working directory
 

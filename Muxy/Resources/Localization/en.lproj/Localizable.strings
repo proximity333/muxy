@@ -234,6 +234,7 @@
 "Connection succeeded" = "Connection succeeded";
 "Controlled by %@" = "Controlled by %@";
 "Copied" = "Copied";
+"Copied selection" = "Copied selection";
 "Copy" = "Copy";
 "Copy %@" = "Copy %@";
 "Copy Path" = "Copy Path";
