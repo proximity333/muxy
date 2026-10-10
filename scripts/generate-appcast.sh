@@ -28,7 +28,7 @@ if [[ ! -x "$SIGN_UPDATE" ]]; then
   exit 1
 fi
 
-DOWNLOAD_URL_PREFIX="${DOWNLOAD_URL_PREFIX:-https://github.com/muxy-app/muxy/releases/download/$TAG/}"
+DOWNLOAD_URL_PREFIX="${DOWNLOAD_URL_PREFIX:-https://github.com/proximity333/muxy/releases/download/$TAG/}"
 
 VERSION="${TAG#v}"
 SIG=$(echo "$SPARKLE_PRIVATE_KEY" | "$SIGN_UPDATE" --ed-key-file - -p "$DMG")
@@ -51,7 +51,7 @@ cat > "$NEW_ITEM_FILE" << EOF
       <sparkle:version>${BUILD_NUMBER}</sparkle:version>
       <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-      <sparkle:fullReleaseNotesLink>https://github.com/muxy-app/muxy/releases/tag/${TAG}</sparkle:fullReleaseNotesLink>
+      <sparkle:fullReleaseNotesLink>https://github.com/proximity333/muxy/releases/tag/${TAG}</sparkle:fullReleaseNotesLink>
       <enclosure url="${DOWNLOAD_URL_PREFIX}${FILENAME}" sparkle:edSignature="${SIG}" length="${SIZE}" type="application/octet-stream" />
     </item>
 EOF
@@ -87,7 +87,7 @@ else
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>Muxy Updates (${CHANNEL})</title>
-    <link>https://github.com/muxy-app/muxy</link>
+    <link>https://github.com/proximity333/muxy</link>
     <description>Updates for Muxy (${CHANNEL} channel)</description>
     <language>en</language>
 ${NEW_ITEM}

@@ -31,7 +31,7 @@ enum WhatsNewService {
     }
 
     private static func releaseURL(for version: String) -> URL {
-        let base = "https://api.github.com/repos/muxy-app/muxy/releases/tags/v"
+        let base = "https://api.github.com/repos/proximity333/muxy/releases/tags/v"
         return URL(string: base + version) ?? URL(fileURLWithPath: "/")
     }
 }

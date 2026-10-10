@@ -144,7 +144,7 @@ jobs:
             --version "${{ needs.validate.outputs.version }}" \
             --sign-identity "${{ steps.identity.outputs.name }}" \
             --sparkle-public-key "${{ steps.sparkle.outputs.public_key }}" \
-            --sparkle-feed-url "https://github.com/muxy-app/muxy/releases/latest/download/appcast-${{ matrix.arch }}.xml"
+            --sparkle-feed-url "https://github.com/proximity333/muxy/releases/latest/download/appcast-${{ matrix.arch }}.xml"
 
       - name: Upload dSYM to Sentry
         env:
@@ -219,7 +219,7 @@ jobs:
         run: |
           mkdir -p prev
           for ARCH in arm64 x86_64; do
-            URL="https://github.com/muxy-app/muxy/releases/latest/download/appcast-${ARCH}.xml"
+            URL="https://github.com/proximity333/muxy/releases/latest/download/appcast-${ARCH}.xml"
             if curl -fsSL "$URL" -o "prev/appcast-${ARCH}.xml"; then
               echo "Fetched previous stable appcast for $ARCH"
             else

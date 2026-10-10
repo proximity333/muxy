@@ -78,17 +78,17 @@ jobs:
 
             on_arm do
               sha256 "${SHA256_ARM64}"
-              url "https://github.com/muxy-app/muxy/releases/download/v#{version}/Muxy-#{version}-arm64.dmg"
+              url "https://github.com/proximity333/muxy/releases/download/v#{version}/Muxy-#{version}-arm64.dmg"
             end
 
             on_intel do
               sha256 "${SHA256_X86_64}"
-              url "https://github.com/muxy-app/muxy/releases/download/v#{version}/Muxy-#{version}-x86_64.dmg"
+              url "https://github.com/proximity333/muxy/releases/download/v#{version}/Muxy-#{version}-x86_64.dmg"
             end
 
             name "Muxy"
             desc "Terminal multiplexer for macOS"
-            homepage "https://github.com/muxy-app/muxy"
+            homepage "https://github.com/proximity333/muxy"
 
             livecheck do
               url :url

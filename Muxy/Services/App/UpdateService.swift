@@ -98,9 +98,9 @@ private final class FeedDelegate: NSObject, SPUUpdaterDelegate {
 
     func feedURLString(for _: SPUUpdater) -> String? {
         #if arch(arm64)
-        "https://github.com/muxy-app/muxy/releases/latest/download/appcast-arm64.xml"
+        "https://github.com/proximity333/muxy/releases/latest/download/appcast-arm64.xml"
         #else
-        "https://github.com/muxy-app/muxy/releases/latest/download/appcast-x86_64.xml"
+        "https://github.com/proximity333/muxy/releases/latest/download/appcast-x86_64.xml"
         #endif
     }
 

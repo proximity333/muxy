@@ -14,7 +14,7 @@ struct WhatsNewView: View {
     }
 
     private var releaseURL: URL {
-        let string = "https://github.com/muxy-app/muxy/releases/tag/v\(version)"
+        let string = "https://github.com/proximity333/muxy/releases/tag/v\(version)"
         return URL(string: string) ?? HelpLinks.repoURL
     }
 
